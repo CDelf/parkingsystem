@@ -10,11 +10,13 @@ public class FareCalculatorService {
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
         }
 
-        int inHour = ticket.getInTime().getHours();
-        int outHour = ticket.getOutTime().getHours();
+		// DONE: Tests were failing because duration was calculated from integer hours,
+		// so it didn't work for decimal duration or duration > 1 day
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
-        int duration = outHour - inHour;
+		double inHour = ticket.getInTime().getTime();
+		double outHour = ticket.getOutTime().getTime();
+
+		double duration = (outHour - inHour) / (60 * 60 * 1000);
 
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
