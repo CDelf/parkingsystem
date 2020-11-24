@@ -6,15 +6,22 @@ import com.parkit.parkingsystem.model.Ticket;
 public class FareCalculatorService {
 
   /**
-   * Method that calculates Price when the vehicle exits the parking. 
-   */ 
-  public void calculateFare(Ticket ticket, boolean isDiscount) {
-    if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime()))) {
-      throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
+  * Method that calculates Price when the vehicle exits the parking.
+  * @param ticket
+  *      Price if registered in the ticket at the end of parking
+  * @param isDiscount
+  *      Sets if discount is applied (recurring users) or not (first visit)
+  */
+  public void calculateFare(final Ticket ticket, final boolean isDiscount) {
+    if ((ticket.getOutTime() == null)
+        || (ticket.getOutTime().before(ticket.getInTime()))) {
+      throw new IllegalArgumentException(
+          "Out time provided is incorrect:" + ticket.getOutTime().toString());
     }
 
-    // DONE: Tests were failing because duration was calculated from integer hours,
-    // so it didn't work for decimal duration or duration > 1 day
+    // DONE: Tests were failing because duration was calculated
+    // from integer hours, so it didn't work for decimal duration
+    // or duration > 1 day
     double inHour = ticket.getInTime().getTime();
     double outHour = ticket.getOutTime().getTime();
     double duration = (outHour - inHour) / (60 * 60 * 1000);
