@@ -36,7 +36,7 @@ public class DataBaseTestConfig extends DataBaseConfig {
   /**
   * Closing of the connection.
   */
-  public void closeConnection(Connection con){
+  public void closeConnection(Connection con) {
     if (con != null) {
       try {
         con.close();

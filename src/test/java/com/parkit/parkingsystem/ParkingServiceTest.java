@@ -1,6 +1,9 @@
 package com.parkit.parkingsystem;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -13,7 +16,15 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Date;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +38,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class ParkingServiceTest {
 
   private static ParkingService parkingService;
+  
+  private static final Logger LOGGER = LogManager.getLogger(ParkingService.class);
 
   @Mock
   private static InputReaderUtil inputReaderUtil;
@@ -47,7 +60,6 @@ public class ParkingServiceTest {
 
   @Test
   public void processIncomingCarTest() throws Exception {
-    parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
     Ticket ticket = new Ticket();
     ticket.setParkingSpot(new ParkingSpot(1, ParkingType.CAR, false));
     ticket.setVehicleRegNumber("ABCDEF");
@@ -66,7 +78,6 @@ public class ParkingServiceTest {
 
   @Test
   public void processIncomingBikeTest() throws Exception {
-    parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
     Ticket ticket = new Ticket();
     ticket.setParkingSpot(new ParkingSpot(1, ParkingType.BIKE, false));
     ticket.setVehicleRegNumber("ABCDEF");
@@ -82,10 +93,22 @@ public class ParkingServiceTest {
     verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
     verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
   }
+  
+  @Test
+  public void processIncomingUnknownVehicleTest() throws Exception {
+    Ticket ticket = new Ticket();
+    ticket.setParkingSpot(new ParkingSpot(1, ParkingType.TEST, false));
+
+    when(inputReaderUtil.readSelection()).thenReturn(1);
+    when(inputReaderUtil.readSelection()).thenReturn(3);
+
+    parkingService.processIncomingVehicle();
+    assertThrows(IllegalArgumentException.class, () 
+        -> parkingService.getVehichleType());
+  }
 
   @Test
   public void processIncomingReccuringUserTest() throws Exception {
-    parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
     Ticket ticket = new Ticket();
     ticket.setParkingSpot(new ParkingSpot(1, ParkingType.CAR, false));
     ticket.setVehicleRegNumber("ABCDEF");
@@ -97,6 +120,16 @@ public class ParkingServiceTest {
 
     parkingService.processIncomingVehicle();
     verify(ticketDAO, Mockito.times(1)).isRecurringUser(anyString());
+  }
+
+  @Test
+  public void processIncomingCar_NegativeParkingNumberTest() throws Exception {
+    Ticket ticket = new Ticket();
+    ticket.setParkingSpot(new ParkingSpot(-1, ParkingType.CAR, false));
+    when(inputReaderUtil.readSelection()).thenReturn(1);
+    
+    parkingService.processIncomingVehicle();
+    assertThatIllegalArgumentException();
   }
 
   @Test

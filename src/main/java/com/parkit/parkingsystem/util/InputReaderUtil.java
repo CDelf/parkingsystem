@@ -53,4 +53,13 @@ public class InputReaderUtil {
       throw e;
     }
   }
+
+  /**
+   * Used in unit tests to get user's input.
+   * @param input
+   *      user's entered command while using the application.
+   */
+  public void getInput(final Scanner input) {
+    scan = input;
+  }
 }

@@ -51,4 +51,11 @@ public class DataBaseConstants {
   */
   public static final String GET_VEHICLE =
       "select * from ticket t where t.VEHICLE_REG_NUMBER=? ";
+
+  //Constant used for DataBaseCongifTests with null ResultSet
+  /**
+  * Request with null result for test.
+  */
+  public static final String NULL_RESULTS =
+      "select * from ticket t where t.VEHICLE_REG_NUMBER=null ";
 }

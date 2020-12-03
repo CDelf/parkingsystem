@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 public class InteractiveShell {
   /**
-  * Records informations during the app initialisation.
+  * Records informations during the app initialization.
   */
   private static final Logger LOGGER = LogManager.getLogger("InteractiveShell");
 
